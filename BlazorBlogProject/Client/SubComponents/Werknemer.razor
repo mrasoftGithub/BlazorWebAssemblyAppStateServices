@@ -1,0 +1,95 @@
+﻿@using BlazorBlogProject.Client.Inlichtingen
+@inject Inlichtingendienst Inlichtingendienst
+@implements IDisposable
+
+<p style="background-color:gainsboro;color:black">
+    <h3>Werknemer</h3>
+
+    @if (Inlichtingendienst.DesInformatie)
+    {
+        <span>
+            Lanceer een verkoopcampagne voor: <b>@Inlichtingendienst.InlichtingenLand</b><br />
+            Te verkopen product: <b>@Inlichtingendienst.InlichtingenProduct</b><br />
+        </span>
+    }
+    else
+    {
+        <span>
+            Lanceer een verkoopcampagne voor: <b>@Land</b><br />
+            Te verkopen product: <b>@Product</b><br />
+        </span>
+    }
+
+    <input @bind="voortgang" class="form-control col-sm-4" />
+    <br />
+    <button class="btn btn-outline-dark" @onclick="Gedaan">Gedaan</button>
+    <br />
+</p>
+
+@code {
+    [Parameter]
+    public string Land { get; set; }
+    [Parameter]
+    public string Product { get; set; }
+
+    private string voortgang;
+
+    void Gedaan()
+    {
+        voortgang = "Gedaan op " + DateTime.Now.ToString("h:mm:ss") + " uur.";
+
+        if (Inlichtingendienst.DesInformatie)
+        {
+            // De inlichtingenofficier heeft de desinformatie geactiveerd
+            Console.WriteLine(DateTime.Now.ToString("h:mm:ss") + " uur, infiltratie succesvol -> " + Inlichtingendienst.InlichtingenLand);
+            Console.WriteLine(DateTime.Now.ToString("h:mm:ss") + " uur, infiltratie succesvol -> " + Inlichtingendienst.InlichtingenProduct);
+            Console.WriteLine("");
+
+            // De desinformatie weer terugsturen naar de Inlichtingendienst zodat die weet dat de desinformatie is geactiveerd
+            Inlichtingendienst.VergaarInlichtingen(this, Inlichtingendienst.InlichtingenLand, Inlichtingendienst.InlichtingenProduct);
+        }
+
+        if (!Inlichtingendienst.DesInformatie)
+        {
+            // Inlichtingen doorspelen naar de Inlichtingendienst
+            Inlichtingendienst.VergaarInlichtingen(this, Land, Product);
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        // Verbinding gelegd met de Inlichtingendienst, de inlichtingenofficier staat open voor signalen vanuit de Inlichtingendienst
+        // dat de Inlichtingendienst desinformatie heeft gestuurd dat verwerkt gaat worden om de concurrent te saboteren
+        Inlichtingendienst.DesInformatieVerstuurd +=
+           async (Source, InlichtingenLand, InlichtingenProduct, DesInformatie) =>
+        await VerwerkDesInformatie(Source, InlichtingenLand, InlichtingenProduct, DesInformatie);
+
+    }
+
+    private async Task VerwerkDesInformatie(ComponentBase Source, string InlichtingenLand, string InlichtingenProduct, bool DesInformatie)
+    {
+        // Alleen iets doen als het signaal van 
+        // een andere component komt
+        if (Source != this)
+        {
+            // refresh UI om de desinformatie van de Inlichtingendienst te activeren of te deactiveren
+            Console.WriteLine(DateTime.Now.ToString("h:mm:ss") + " uur refresh UI components om de desinformatie van de Inlichtingendienst te activeren of te deactiveren");
+            Console.WriteLine(DateTime.Now.ToString("h:mm:ss") + " uur, InlichtingenLand -> " + InlichtingenLand);
+            Console.WriteLine(DateTime.Now.ToString("h:mm:ss") + " uur, InlichtingenProduct -> " + InlichtingenProduct);
+            Console.WriteLine(DateTime.Now.ToString("h:mm:ss") + " uur, DesInformatie -> " + DesInformatie);
+            Console.WriteLine(DateTime.Now.ToString("h:mm:ss") + " maar andere acties zijn ook mogelijk");
+            Console.WriteLine("");
+            // refresh UI Components
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    void IDisposable.Dispose()
+    {
+        // Verbinding verbreken met de Inlichtingendienst als de inlichtingenofficier niet meer ter plekke is
+        Inlichtingendienst.DesInformatieVerstuurd -=
+           async (Source, InlichtingenLand, InlichtingenProduct, DesInformatie) =>
+        await VerwerkDesInformatie(Source, InlichtingenLand, InlichtingenProduct, DesInformatie);
+    }
+
+}

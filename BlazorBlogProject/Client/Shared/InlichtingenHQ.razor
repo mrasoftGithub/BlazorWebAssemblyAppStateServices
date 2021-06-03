@@ -1,0 +1,72 @@
+﻿@using BlazorBlogProject.Client.Inlichtingen
+@inject Inlichtingendienst Inlichtingendienst
+@implements IDisposable
+
+<h1>Inlichtingendienst</h1>
+
+<div>
+    Deze inlichtingen hebben we ontvangen van onze inlichtingenofficier,<br />
+    de concurrent richt zich op:<br />
+    <ul>
+        <li>Dit land:&nbsp;<b>@Inlichtingendienst.InlichtingenLand</b></li>
+        <li>Met dit product:&nbsp;<b>@Inlichtingendienst.InlichtingenProduct</b><br /></li>
+    </ul>
+    <br />
+
+    Verstuur desinformatie:<br />
+    Land&nbsp;<input @bind="DesInformatieLand" class="form-control col-sm-6" />
+    Product&nbsp;<input @bind="DesInformatieProduct" class="form-control col-sm-6" />
+    <button class="btn btn-danger" @onclick="Verstuur">Start infiltratie</button><br /><br />
+    <button class="btn btn-info" @onclick="Annuleer">Stop infiltratie</button>
+
+</div>
+
+@code {
+
+    private string DesInformatieLand = "Somalië";
+    private string DesInformatieProduct = "Zonnestudio's";
+
+    void Verstuur()
+    {
+        Inlichtingendienst.MaakDesInformatie(this, DesInformatieLand, DesInformatieProduct, true);
+    }
+
+    void Annuleer()
+    {
+        Inlichtingendienst.MaakDesInformatie(this, DesInformatieLand, DesInformatieProduct, false);
+    }
+
+    protected override void OnInitialized()
+    {
+        // De Inlichtingendienst is geopend, kunnen detecteren dat er vanuit het werkterrein Inlichtingen zijn verstuurd
+        Inlichtingendienst.InlichtingenVerstuurd +=
+            async (Source, InlichtingenLand, InlichtingenProduct) =>
+        await InlichtingenDieZijnBinnengekomen(Source, InlichtingenLand, InlichtingenProduct);
+    }
+
+    private async Task InlichtingenDieZijnBinnengekomen(ComponentBase Source, string InlichtingenLand, string InlichtingenProduct)
+    {
+        // Alleen iets doen als het signaal van 
+        // een andere component komt
+        if (Source != this)
+        {
+            // refresh UI om de ontvangen inlichtingen van de inlichtingenofficier te zien
+            Console.WriteLine(DateTime.Now.ToString("h:mm:ss") + " uur refresh UI components om de ontvangen inlichtingen van de inlichtingenofficier te zien");
+            Console.WriteLine(DateTime.Now.ToString("h:mm:ss") + " InlichtingenLand -> " + InlichtingenLand);
+            Console.WriteLine(DateTime.Now.ToString("h:mm:ss") + " InlichtingenProduct -> " + InlichtingenProduct);
+            Console.WriteLine(DateTime.Now.ToString("h:mm:ss") + " maar andere acties zijn ook mogelijk");
+            Console.WriteLine("");
+            // refresh UI Components
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    void IDisposable.Dispose()
+    {
+        // Verbinding met werkterrein verbreken als de Inlichtingendienst is gesloten
+        Inlichtingendienst.InlichtingenVerstuurd -=
+            async (Source, InlichtingenLand, InlichtingenProduct) =>
+        await InlichtingenDieZijnBinnengekomen(Source, InlichtingenLand, InlichtingenProduct);
+    }
+
+}

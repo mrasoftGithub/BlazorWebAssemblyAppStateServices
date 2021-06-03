@@ -1,0 +1,211 @@
+﻿
+DBCC CHECKIDENT('[EIGENAAR]', RESEED,3);
+------------
+
+http://localhost:64818/api/ServiceDb/GetTotaalAantalEigenaren/
+http://localhost:64818/api/ServiceDb/GetLijstEigenaren
+http://localhost:64818/api/ServiceDb/VoegToe
+
+------------
+
+Program.cs
+// Als: dit opgestart moet worden vanuit Program.cs
+//var host = builder.Build();
+//var ServiceViewModelMemoryClass = host.Services.GetRequiredService<IServiceViewModel>();
+//ServiceViewModelMemoryClass.getAantal();
+
+//Task<int> GetTotaalAantal();
+
+//Task<BlazorBlogProject.Shared.EIGENAAR> VoegToe(EIGENAAR EIGENAAR);
+
+//public async Task<int> GetTotaalAantal()
+//{
+//    Console.WriteLine("GetTotaalAantal");
+//    return await Task.Run(() => _lijstEigenaren.Count());
+//}
+
+//public async Task<EIGENAAR> VoegToe(EIGENAAR eigenaar)
+//{
+//    Console.WriteLine("voegToe");
+//    eigenaar.ID = _lijstEigenaren.Max(e => e.ID) + 1;
+//    _lijstEigenaren.Add(eigenaar);
+//    return await Task.Run(() => eigenaar);
+//}
+
+//protected override async Task OnInitializedAsync()
+//{
+//    // Waarden leegmaken
+//    _serviceViewModelClass.regio = null;
+//    _serviceViewModelClass.omschrijving = null;
+//    // Uitlezen hoeveel eigenaren we reeds hebben
+//    // Eigenaren = await _serviceViewModelClass.TotaalAantal();
+//}
+
+// private IEnumerable<EIGENAAR> Eigenaren = new List<EIGENAAR>();
+
+// @code
+// {
+//     protected override void OnInitialized()
+//     {
+//         // Waarden leegmaken
+//         // _serviceViewModelClass.regio = null;
+//         // _serviceViewModelClass.omschrijving = null;
+// 
+//         // Ophalen totaal aantal
+//         // _serviceViewModelClass.GetTotaalAantal();
+//     }
+// 
+// }
+
+void GetTotaalAantal();
+
+public void GetTotaalAantal()
+{
+   //TotaalAantal = _lijstEigenaren.Count();
+   //Console.WriteLine("TotaalAantal, aantal gevonden elementen:" + TotaalAantal);
+   //Console.WriteLine("");
+}        
+
+//--------------------------------//
+// Map the ViewModel to the Model //
+//--------------------------------//
+// @inject IServiceViewModel _serviceViewModelClass
+// GEBRUIKER gebruiker = _serviceViewModelClass
+// web API (.., gebruiker)
+
+//------------------------------------//
+// Map the Model --> to the ViewModel //
+//------------------------------------//
+// @inject IServiceViewModel _serviceViewModelClass
+// gebruiker = web API...
+// _serviceViewModelClass = gebruiker
+
+DBCC CHECKIDENT('[EIGENAAR]', RESEED,3);
+
+Thread.Sleep(10000);
+
+-------------------------------------
+        public ServiceViewModel() { }
+
+        public static implicit operator ServiceViewModel(EIGENAAR eigenaar)
+        {
+            return new ServiceViewModel
+            {
+                Omschrijving = eigenaar.omschrijving,
+                Regio = eigenaar.regio,
+                Voornaam = eigenaar.voornaam,
+                Achternaam = eigenaar.achternaam,
+                VolledigeNaam = eigenaar.voornaam + " " + eigenaar.achternaam
+            };
+        }
+-------------------------------------
+
+        public string VolledigeNaam { get; set; }
+        public string VolledigeNaam { get; set; }
+        public List<IServiceViewModel> Eigenaren { get; set; }
+        public List<IServiceViewModel> Eigenaren
+        {
+            get => _Eigenaren;
+            set => _Eigenaren = value;
+        }
+        private List<IServiceViewModel> _Eigenaren;
+
+-------------------------------------
+
+        private List<EIGENAAR> _eigenaartjes;
+        private List<IServiceViewModel> _eigenaartjes2;
+
+        private List<EIGENAAR> _eigenaartjes2;
+        private EIGENAAR xx = new EIGENAAR
+        {
+            ID = 0,
+            Omschrijving = "1",
+            Voornaam = "2",
+            Achternaam = "3",
+            Regio = "4"
+        };
+
+        _eigenaartjes2.Add(xx);
+
+        //---
+        // this._Eigenaren.Add(x);
+        // this.Eigenaren.Add(x);
+        //--- Object reference not set to an instance of an object.
+        // _eigenaartje.Achternaam = _eigenaartje.Voornaam + " " + _eigenaartje.Achternaam;
+        // _eigenaartjes2.Add(xx);
+
+        //-------------------------------------------------
+        // dit proberen...
+        _eigenaartjes = (List<EIGENAAR>)await _serviceModel.GetLijstEigenaren();
+            foreach (EIGENAAR _eigenaartje in _eigenaartjes)
+            {
+                ServiceViewModel x = new ServiceViewModel
+                {
+                    Voornaam = _eigenaartje.Voornaam,
+                    Achternaam = _eigenaartje.Achternaam,
+                    Regio = _eigenaartje.Regio,
+                    Omschrijving = _eigenaartje.Omschrijving,
+                    VolledigeNaam = _eigenaartje.Voornaam + " " + _eigenaartje.Achternaam,
+                    TotaalAantalEigenaren = 0,
+                    Eigenaren = new List<IServiceViewModel> { }
+                };
+                Console.WriteLine(x.VolledigeNaam);
+                // _eigenaartjes2.Add(x);
+            }
+            return _eigenaartjes;
+            //-------------------------------------------------
+
+-------------------------------------
+
+        public string VolledigeNaam { get; set; }
+        public string VolledigeNaam { get; set; }
+
+-----------------------------------
+
+        public ServiceViewModel() { }
+
+        public static implicit operator ServiceViewModel(EIGENAAR eigenaar)
+        {
+            return new ServiceViewModel
+            {
+                Omschrijving = eigenaar.Omschrijving,
+                Regio = eigenaar.Regio,
+                Voornaam = eigenaar.Voornaam,
+                Achternaam = eigenaar.Achternaam,
+            };
+        }
+
+-----------------------------------
+
+        public List<IServiceViewModel> Eigenaren { get; set; }
+
+        private List<IServiceViewModel> _Eigenaren;
+
+        public List<IServiceViewModel> Eigenaren
+        {
+            get => _Eigenaren;
+            set => _Eigenaren = value;
+        }
+
+-----------------------------------
+
+        //[HttpGet]
+        //public ActionResult<List<EIGENAAR>> TotaalAantal()
+        //{
+        //    return Ok(_dbContextClass.EIGENAAR);
+        //}
+-----------------------------------
+            //await Task.Run(() =>
+            //{
+            //    TotaalAantalEigenaren = 66;
+            //});
+-----------------------------------
+
+        //Task GetTotAantalEigenaren();
+
+        //public async Task GetTotAantalEigenaren()
+        //{
+        //    TotAantalEigenaren = await _serviceModel.GetTotaalAantalEigenaren();
+        //}
+
+        // await _TotaalAantalViewModel.GetTotAantalEigenaren();

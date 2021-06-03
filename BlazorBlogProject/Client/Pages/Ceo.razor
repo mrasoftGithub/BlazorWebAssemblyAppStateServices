@@ -1,0 +1,30 @@
+﻿@page "/ceo"
+<br />
+<p style="background-color:crimson;color:yellow">
+    <h1>CEO</h1>
+    We veroveren de markt van: <input @bind="verzonnen_land" class="form-control col-sm-2" />
+    Met de verkoop van:<input @bind="verzonnen_product" class="form-control col-sm-2" /><br />
+    <button class="btn btn-outline-warning" @onclick="Beveel">Beveel</button><br />
+    <br />
+    De organisatie gaat @Product verkopen in @Land
+</p>
+
+<BlazorBlogProject.Client.SubComponents.Werknemer Land=@Land Product=@Product />
+
+<BlazorBlogProject.Client.SubComponents.Partner @bind-Land=Land @bind-Product=Product />
+
+@code {
+
+    private string verzonnen_land = "Ethiopië";
+    private string verzonnen_product = "zonnebanken";
+
+    public string Land;
+    public string Product;
+
+    void Beveel()
+    {
+        Land = verzonnen_land;
+        Product = verzonnen_product;
+    }
+
+}

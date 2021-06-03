@@ -1,0 +1,34 @@
+﻿<p style="background-color:green;color:white">
+    <h2>Partner</h2>
+    Corrigeer land:<input @bind="gecorrigeerd_land" class="form-control col-sm-2" />
+    Corrigeer product:<input @bind="gecorrigeerd_product" class="form-control col-sm-2" /><br />
+    <button class="btn btn-outline-warning" @onclick="Corrigeer">Corrigeer</button><br /><br />
+    De organisatie gaat @Product verkopen in @Land<br />
+</p>
+
+@code {
+
+    private string gecorrigeerd_land="Svalbard";
+    private string gecorrigeerd_product="gezichtsbruiners";
+
+    [Parameter]
+    public string Land { get; set; }
+
+    [Parameter]
+    public EventCallback<string> LandChanged { get; set; }
+
+    [Parameter]
+    public string Product { get; set; }
+
+    [Parameter]
+    public EventCallback<string> ProductChanged { get; set; }
+
+    async Task Corrigeer()
+    {
+        Land = gecorrigeerd_land; ;
+        Product = gecorrigeerd_product;
+        await LandChanged.InvokeAsync(Land);
+        await ProductChanged.InvokeAsync(Product);
+    }
+
+}

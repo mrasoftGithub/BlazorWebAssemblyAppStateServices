@@ -1,0 +1,53 @@
+﻿@page "/totaalaantal"
+
+@using BlazorBlogProject.Client.ViewModels
+@using BlazorBlogProject.Shared
+
+@inject ITotaalAantalViewModel _totaalAantalViewModel
+
+<h1>Totaal Aantal</h1>
+@if (Eigenaren == null)
+{
+    <p><em>Nog geen gegevens gevonden.</em></p>
+}
+else
+{
+    <p>
+        Op dit moment hebben we @_totaalAantalViewModel.TotAantalEigenaren gelukkige autobezitters.
+    </p>
+
+    <table class="table">
+
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Omschrijving</th>
+                <th>Naam</th>
+                <th>Regio</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var eigenaar in Eigenaren)
+            {
+                <tr>
+                    <td>@eigenaar.ID</td>
+                    <td>@eigenaar.Omschrijving</td>
+                    <td>@eigenaar.Voornaam&nbsp;@eigenaar.Achternaam</td>
+                    <td>@eigenaar.Regio</td>
+                </tr>
+            }
+        </tbody>
+
+    </table>
+}
+
+@code
+    {
+    private IEnumerable<EIGENAAR> Eigenaren = new List<EIGENAAR>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Eigenaren = await _totaalAantalViewModel.GetLijstEigenaren();
+    }
+}
